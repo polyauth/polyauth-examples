@@ -1,0 +1,18 @@
+# OSX
+.DS_Store
+._*
+.Spotlight-V100
+.Trashes
+
+# Vim
+.*.sw[a-z]
+*.un~
+Session.vim
+
+# JavaScript
+bower_components
+node_modules
+
+# Project
+prod
+

@@ -1,0 +1,6 @@
+{
+	"realm_id": "Your Realm ID",
+	"realm_secret": "Your Realm Secret",
+	"redirect_uri": "https://localhost:9000",
+	"apiv": "v1"
+}
