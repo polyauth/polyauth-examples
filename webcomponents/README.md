@@ -4,10 +4,10 @@
 
 Install dependencies:
 
-``sh
+```sh
 $ npm install
 $ bower install
-``
+```
 
 Configure the application by changing values in the `../config.json`.
 
