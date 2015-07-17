@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang='en'>
+	<head>
+
+		<meta charset='utf-8'>
+		<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+		<meta name='viewport' content='width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes'>
+
+		<title>JavaScript Example</title>
+
+		<script src='fetch/fetch.js'></script>
+		<script src='polyauth/polyauth.js'></script>
+
+	</head>
+	<body>
+
+		<div id='host'></div>
+		<div></div>
+
+		<script>
+
+			'use strict';
+
+			// Use `../config.json` to set up those values
+			const REALM_ID = '';
+			const REALM_SECRET = '';
+			const REDIRECT_URI = '';
+			const APIV = '';
+			//
+
+			function createAuthPage(options) {
+				options = options || {};
+
+				var ul = document.createElement('ul');
+				PolyAuth.Key.all().forEach(
+					function(key) {
+						var a = document.createElement('a');
+						a.innerHTML = PolyAuth.Key.parse(key).prov;
+						a.setAttribute('href', PolyAuth.authCodeURI(REALM_ID, {
+							key: key,
+							apiv: APIV,
+							redirectURI: REDIRECT_URI,
+							scope: options.scope,
+							op: options.op
+						}));
+
+						var li = document.createElement('li');
+						li.appendChild(a);
+						ul.appendChild(li);
+					});
+
+				return ul;
+			};
+
+			function createUserPage(data) {
+				var root = document.createElement('div');
+				var msg = document.createElement('p');
+				msg.innerHTML = 'Hello, ' + data.info.name + '!';
+
+				root.appendChild(msg);
+				return root;
+			};
+
+			function addSignOutButton(node) {
+				var button = document.createElement('button');
+				button.innerHTML = 'sign out';
+				button.addEventListener('click', signOut, false);
+
+				node.appendChild(button);
+				return node;
+			};
+
+			function switchPage(next) {
+				var host = document.getElementById('host');
+				var curr = host.childNodes[0];
+				if (curr) { host.replaceChild(next, curr); }
+				else { host.appendChild(next); }
+			}
+
+			function signOut() {
+				PolyAuth.signOut(REALM_ID);
+				switchPage(createAuthPage());
+			};
+
+			// Sign-in
+
+			PolyAuth
+				.signIn(REALM_ID)
+				.then(function(resp) {
+					PolyAuth
+						.fetch(PolyAuth.api(resp.accessToken, APIV).profile('me').get())
+						.then(function(object) {
+							switchPage(addSignOutButton(createUserPage(object.data)));
+						});
+				})
+				.catch(function() {
+					switchPage(createAuthPage());
+				});
+
+/*
+			// Standalone Profile
+
+			var op = 's/profile';
+			var qs = PolyAuth.QS.parse();
+			if (PolyAuth.State.take(qs.state)) {
+				PolyAuth
+					.fetch(PolyAuth.api(APIV).realm(REALM_ID).auth(qs.key).standaloneProfile({code: qs.code}))
+					.then(function(resp) {
+						if (resp.error) { return Promise.reject(resp); }
+						console.log(resp);
+
+						switchPage(createUserPage(resp));
+					})
+					.catch(function(error) {
+						console.log(error);
+
+						switchPage(createAuthPage({op: op}));
+					});
+			}
+			else {
+				switchPage(createAuthPage({op: op}));
+			}
+*/
+
+/*
+			// Standalone Token
+
+			var op = 's/token';
+			var qs = PolyAuth.QS.parse();
+			if (PolyAuth.State.take(qs.state)) {
+				PolyAuth
+					.fetch(PolyAuth.api(APIV).realm(REALM_ID).auth(qs.key).standaloneToken({code: qs.code, secret: REALM_SECRET}))
+					.then(function(resp) {
+						if (resp.error) { return Promise.reject(resp); }
+						console.log(resp);
+					})
+					.catch(function(error) {
+						console.log(error);
+						switchPage(createAuthPage({op: op}));
+					});
+			}
+			else {
+				switchPage(createAuthPage({op: op}));
+			}
+*/
+
+		</script>
+
+	</body>
+</html>

@@ -1,0 +1,19 @@
+{
+  "name": "polyauth-javascript-example",
+  "version": "0.1.0",
+  "authors": [
+    "Andrei Nesterov <ae.nesterov@polyauth.com>"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "fetch": "^0.9.0",
+    "polyauth": "^0.1.4"
+  }
+}
