@@ -1,0 +1,116 @@
+<link rel='import' href='../polymer/polymer.html'>
+<link rel='import' href='../iron-image/iron-image.html'>
+<link rel='import' href='../paper-toggle-button/paper-toggle-button.html'>
+<link rel='import' href='../paper-styles/paper-styles.html'>
+<link rel='import' href='../awesome-icons/awesome-square-brand-icons.html'>
+<link rel='import' href='../polyauth-signin-pages/polyauth-signin-pages.html'>
+<link rel='import' href='../polyauth-element/polyauth-authcode-endpoints.html'>
+<link rel='import' href='../polyauth-element/polyauth-user-authlinks.html'>
+<link rel='import' href='../polyauth-element/polyauth-user.html'>
+
+<dom-module id='ex-app'>
+	<link rel='import' type='css' href='ex-app.css'>
+	<template>
+
+		<polyauth-signin-pages
+			id='pages'
+			apiv='[[apiv]]'
+			realm-id='[[realmId]]'
+			access-token='{{token}}'
+			auto>
+
+			<section signed-out>
+				<!-- This block will be visible for
+						 users who haven't signed in yet -->
+
+				<!-- Sign-in buttons -->
+				<template is='dom-repeat' items='[[endpoints]]'>
+					<a href='[[item.authCodeURI]]'>
+						<iron-icon
+							id='icon'
+							icon$='[[item.icon]]'
+							alt='[[item.key]]'>
+						</iron-icon>
+					</a>
+				</template>
+
+			</section>
+
+			<section signed-in>
+				<!-- This block will be visible for
+						 users who have already signed in -->
+
+				<!-- User's profile -->
+				<iron-image src='[[user.profile.data.info.image]]'></iron-image>
+				<div>Hello, <span>[[user.profile.data.info.name]]</span>!</div>
+
+				<!-- Link buttons -->
+				<div>
+					<template is='dom-repeat' items='[[authLinks]]'>
+						<iron-icon id='icon' icon$='[[item.icon]]'></iron-icon>
+						<paper-toggle-button
+							id='button'
+							checked='[[!item.removed]]'
+							on-change='_handleAuthLink'>
+						</paper-toggle-button>
+					</template>
+				</div>
+
+				<!-- Sign-out button -->
+				<button polyauth-sign-out>Sign Out</button>
+
+				<polyauth-user-authlinks
+					id='authLinksProxy'
+					access-token='[[token]]'
+					apiv='[[apiv]]'
+					realm-id='[[realmId]]'
+					redirect-uri='[[redirectUri]]'
+					user-id='me'
+					objects='[[user.auth]]'
+					objects-proxy='{{authLinks}}'>
+				</polyauth-user-authlinks>
+
+				<polyauth-user
+					access-token='[[token]]'
+					apiv='[[apiv]]'
+					object-id='me'
+					fields='["profile", "auth"]'
+					object='{{user}}'
+					auto>
+				</polyauth-user>
+
+			</section>
+
+		</polyauth-signin-pages>
+
+		<polyauth-authcode-endpoints
+			apiv='[[apiv]]'
+			realm-id='[[realmId]]'
+			redirect-uri='[[redirectUri]]'
+			objects='{{endpoints}}'>
+		</polyauth-authcode-endpoints>
+
+	</template>
+</dom-module>
+
+<script>
+
+	Polymer({
+	
+		is: 'ex-app',
+
+		properties: {
+			// Use `../config.json` to set up those values
+			apiv: { type: String, value: ''},
+			realmId: { type: String, value: '' },
+			redirectUri: { type: String, value: ''}
+			//
+		},
+
+		_handleAuthLink: function(e) {
+			this.$.authLinksProxy.handle(e.model.index);
+		}
+	
+	});
+
+</script>

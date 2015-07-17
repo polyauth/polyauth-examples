@@ -12,7 +12,7 @@ Session.vim
 # JavaScript
 bower_components
 node_modules
-
-# Project
+_app
+_rel
 prod
 
